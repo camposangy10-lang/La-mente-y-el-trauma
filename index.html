@@ -1,26 +1,27 @@
-<!DOCTYPE html>
+<!<!DOCTYPE html>
 <html lang="es">
 <head>
-    <!-- Chosen Palette: Midnight Sapphire & Dream Ether -->
+    <!-- Chosen Palette: Midnight Sapphire & Vintage Ether -->
     <!-- Application Structure Plan:
-        El juego está estructurado como una Aventura Narrativa Interactiva / Novela Visual Psicológica (SPA):
-        1. Pantalla de Bienvenida: Establece el ambiente místico (música sugerida, temática de introspección).
-        2. Canvas de Fondo Dual:
-           - Fondo general: Campo de estrellas dinámico que reacciona según la fase emocional (caída, tiempo congelado, portal).
-           - Arte Procedural Escénico: Representaciones visuales artísticas hechas completamente en HTML5 Canvas (sin SVG ni imágenes externas) para ilustrar cada estación de la narración de forma inmersiva.
-        3. Interfaz de Novela Visual (HUD & Dialogue Box):
-           - Indicadores de puntuación en tiempo real para 'Escapismo' y 'Consciencia'.
-           - Sistema de máquina de escribir para los diálogos de la "Voz Interior" (que se revela como Tu Subconsciente).
-           - Opciones de decisión bifurcada que alteran las estadísticas y encaminan la historia.
-        4. Pantalla de Inventario Mental & Análisis:
-           - Formulario de reflexión pedagógica (El Muro, El Sombrerero, La Llave de Oro).
-           - Informe diagnóstico basado en la correlación entre Escapismo y Consciencia, entregando una retroalimentación constructiva para la vida real.
+        El juego está estructurado como una Aventura Narrativa Interactiva y Psicológica (SPA):
+        1. Pantalla de Bienvenida: Atmósfera introspectiva con temática de exploración del subconsciente.
+        2. Campo de Estrellas Dinámico (HTML5 Canvas): Fondo azul estelar constante con físicas reactivas a la velocidad emocional de la narración (caída, tiempo congelado, vórtice).
+        3. Galería Fotográfica Nostálgica (Vintage Analog Style):
+           - Fotografía de alta resolución con estilo de cámara antigua (grano de película, viñeta, virado sepia/frío y bordes suavizados).
+           - Tamaño amplio y prominente en el centro de la pantalla.
+           - Transiciones suaves de aparición y desaparición (crossfade) coordinadas con los momentos cumbre de la historia (Alicia, Madriguera, Sombrerero, Jardín de Espejos, Puerta Dorada).
+        4. Interfaz de Novela Visual (HUD & Dialogue Box):
+           - Guía a cargo de la "Voz Interior" (que al final se revela como "Tu Subconsciente").
+           - Indicadores en tiempo real para 'Escapismo' y 'Consciencia'.
+           - Sistema de decisiones bifurcadas con impacto pedagógico.
+        5. Diagnóstico de Introspección & Inventario:
+           - Formulario de reflexión personal y diagnóstico automático basado en el balance de Escapismo vs Consciencia.
     -->
     <!-- Visualization & Content Choices:
-        - Estrellas y Efectos de Fondo: HTML5 Canvas 2D con renderizado procedimental para simular velocidad, congelamiento temporal y vórtices.
-        - Ilustraciones Escénicas: HTML5 Canvas 2D dedicado para dibujar siluetas estilizadas y atmósferas de iluminación (Alicia, La Madriguera, El Reloj del Sombrerero, El Jardín, La Puerta).
-        - Cuadro de Diálogo & Formularios: HTML/Tailwind CSS con soporte glassmorphism.
-        - Justificación: Garantiza independencia total de servidores externos, fluidez total en cualquier dispositivo y cumplimiento estricto con la política de NO utilizar SVG ni Mermaid JS.
+        - Estrellas de Fondo: HTML5 Canvas 2D interactivo.
+        - Escenas Fotográficas: Elementos <img> con fuentes fotográficas estilizadas y filtros CSS de cámara analógica vintage (grain, vignette, sepia).
+        - Contenedores: Responsive con Tailwind CSS y Glassmorphism.
+        - Justificación: Ofrece una experiencia visualmente impactante, inmersiva y emotiva para estudiantes de 16-17 años, cumpliendo estrictamente con la política de NO utilizar SVG ni Mermaid JS.
     -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
 
@@ -35,10 +36,10 @@
     
     <style>
         :root {
-            --bg-color: #040b16;
+            --bg-color: #030814;
             --text-main: #e2e8f0;
             --accent: #3b82f6;
-            --accent-glow: rgba(59, 130, 246, 0.4);
+            --accent-glow: rgba(59, 130, 246, 0.45);
         }
 
         body {
@@ -79,37 +80,61 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at center, transparent 0%, #040b16 90%);
+            background: radial-gradient(circle at center, transparent 15%, #030814 90%);
             z-index: 2;
             pointer-events: none;
         }
 
-        /* Contenedor del arte escénico */
-        #story-art-container {
+        /* --- CONTENEDOR DE IMÁGENES FOTOGRÁFICAS VINTAGE --- */
+        #story-image-container {
             position: absolute;
-            top: 32%;
+            top: 33%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 90%;
-            max-width: 580px;
-            height: 38vh;
+            width: 92%;
+            max-width: 680px;
+            height: 42vh;
+            max-height: 380px;
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 5;
             opacity: 0;
-            transition: opacity 1.2s ease-in-out;
+            transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.95), 0 0 35px rgba(59, 130, 246, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        #story-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* Filtro de Cámara Analógica Vintage / Nostálgica */
+            filter: sepia(0.3) contrast(1.15) brightness(0.85) saturate(0.8);
+            transition: transform 9s ease-out;
+        }
+
+        #story-image-container.active #story-image {
+            transform: scale(1.08);
+        }
+
+        /* Efecto de Viñeta y Grano sobre la Fotografía */
+        #story-image-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            box-shadow: inset 0 0 70px rgba(3, 8, 20, 0.9);
+            background: linear-gradient(180deg, rgba(3, 8, 20, 0.15) 0%, rgba(3, 8, 20, 0.65) 100%);
             pointer-events: none;
         }
 
-        #art-canvas {
-            width: 100%;
-            height: 100%;
-            border-radius: 16px;
-            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.9), 0 0 30px rgba(59, 130, 246, 0.25);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-        }
-
+        /* --- CUADRO DE DIÁLOGO --- */
         #dialogue-box {
             position: absolute;
             bottom: 4%;
@@ -117,13 +142,13 @@
             transform: translateX(-50%);
             width: 92%;
             max-width: 820px;
-            background: rgba(10, 20, 38, 0.88);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(12px);
+            background: rgba(8, 16, 32, 0.92);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(14px);
             border-radius: 16px;
             padding: 1.75rem 2rem;
             z-index: 10;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6), 0 0 25px var(--accent-glow);
+            box-shadow: 0 10px 35px rgba(0,0,0,0.8), 0 0 25px var(--accent-glow);
             transition: all 0.4s ease;
             opacity: 0;
             pointer-events: none;
@@ -136,7 +161,7 @@
 
         #speaker-name {
             font-family: 'Playfair Display', serif;
-            font-size: 1.2rem;
+            font-size: 1.25rem;
             color: #93c5fd;
             font-weight: 700;
             margin-bottom: 0.4rem;
@@ -232,7 +257,7 @@
             z-index: 15;
             width: 92%;
             max-width: 720px;
-            background: rgba(10, 20, 38, 0.95);
+            background: rgba(8, 16, 32, 0.95);
             border: 1px solid var(--accent);
             border-radius: 16px;
             padding: 2rem;
@@ -240,7 +265,7 @@
             left: 50%;
             transform: translate(-50%, -50%);
             display: none;
-            box-shadow: 0 0 45px rgba(0,0,0,0.85);
+            box-shadow: 0 0 45px rgba(0,0,0,0.95);
             max-height: 88vh;
             overflow-y: auto;
         }
@@ -287,15 +312,15 @@
         }
 
         .stat-badge {
-            background: rgba(0, 0, 0, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(0, 0, 0, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.18);
             padding: 0.4rem 0.9rem;
             border-radius: 9999px;
             font-size: 0.85rem;
             display: flex;
             align-items: center;
             gap: 0.4rem;
-            backdrop-filter: blur(4px);
+            backdrop-filter: blur(6px);
         }
     </style>
 </head>
@@ -306,9 +331,9 @@
         <canvas id="bg-canvas"></canvas>
         <div class="overlay"></div>
 
-        <!-- Contenedor del Arte Escénico en Canvas -->
-        <div id="story-art-container">
-            <canvas id="art-canvas" width="600" height="350"></canvas>
+        <!-- Contenedor para Imágenes Fotográficas Nostálgicas -->
+        <div id="story-image-container">
+            <img id="story-image" src="" alt="Escena de la historia">
         </div>
 
         <!-- Heads Up Display (HUD) -->
@@ -374,6 +399,15 @@
     </div>
 
     <script>
+        /* --- BANCO DE IMÁGENES FOTOGRÁFICAS NOSTÁLGICAS (ESTILO CÁMARA ANTIGUA) --- */
+        const imageGallery = {
+            'alicia': 'https://images.unsplash.com/photo-1518895949257-7621c3c786d7?auto=format&fit=crop&w=1200&q=80',
+            'madriguera': 'https://images.unsplash.com/photo-1509114397022-ed747cca3f65?auto=format&fit=crop&w=1200&q=80',
+            'sombrerero': 'https://images.unsplash.com/photo-1501139083538-0139583c060f?auto=format&fit=crop&w=1200&q=80',
+            'jardin': 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1200&q=80',
+            'puerta': 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1200&q=80'
+        };
+
         /* --- ESTADO DEL JUEGO --- */
         const state = {
             scene: 'intro',
@@ -383,19 +417,18 @@
                 escapism: 0,
                 awareness: 0
             },
-            visualEffect: 'stars',
-            currentArtScene: null
+            visualEffect: 'stars'
         };
 
-        /* --- GUION NARRATIVO Y PEDAGÓGICO COMPLETO --- */
+        /* --- GUION NARRATIVO COMPLETO --- */
         const script = {
             'intro': [
                 { speaker: 'Voz Interior', text: 'Respira profundo... Cierra los ojos un instante y concéntrate en tu respiración.' },
                 { speaker: 'Voz Interior', text: 'Bienvenido a un viaje al interior de tu propia mente. Soy esa parte silenciosa dentro de ti que observa todo lo que sientes.' },
                 { speaker: 'Voz Interior', text: 'A veces, el mundo real exige demasiado o duele sin previo aviso. Cuando eso ocurre, nuestra mente crea refugios secretos o desactiva las emociones.' },
-                { speaker: 'Voz Interior', text: 'Piensa en Alicia: una joven agobiada por las presiones y las dudas, que un día decidió seguir a un conejo hacia lo desconocido...', art: 'alicia' },
+                { speaker: 'Voz Interior', text: 'Piensa en Alicia: una joven agobiada por las presiones y las dudas, que un día decidió seguir a un conejo hacia lo desconocido...', image: 'alicia' },
                 { speaker: 'Voz Interior', text: 'Usaremos su travesía como un espejo para comprender cómo funciona tu propia imaginación protectora.' },
-                { speaker: 'Voz Interior', text: 'Ha llegado el momento. Caigamos juntos por la madriguera...', effect: 'falling', art: 'madriguera', nextScene: 'madriguera' }
+                { speaker: 'Voz Interior', text: 'Ha llegado el momento. Caigamos juntos por la madriguera...', effect: 'falling', image: 'madriguera', nextScene: 'madriguera' }
             ],
             'madriguera': [
                 { speaker: 'Voz Interior', text: 'El suelo firme desaparece. Caes en un vacío sereno donde tus recuerdos flotan como cometas en la noche.' },
@@ -424,7 +457,7 @@
                 { speaker: 'Voz Interior', text: 'Continuemos explorando este laberinto mental...', nextScene: 'fiesta_te' }
             ],
             'fiesta_te': [
-                { speaker: 'Voz Interior', text: 'Emergemos en una mesa iluminada por una luna plateada. El aire es denso y tranquilo.', effect: 'frozen', art: 'sombrerero' },
+                { speaker: 'Voz Interior', text: 'Emergemos en una mesa iluminada por una luna plateada. El aire es denso y tranquilo.', effect: 'frozen', image: 'sombrerero' },
                 { speaker: 'Voz Interior', text: 'Aquí habita el Sombrerero. Él discutió con el Tiempo y, como castigo, para él siempre son las seis de la tarde.' },
                 { speaker: 'Voz Interior', text: 'En la psicología, esto se llama "Tiempo Congelado". Cuando vivimos un dolor no procesado, una parte de nosotros se queda atrapada a esa hora del té.' },
                 {
@@ -445,7 +478,7 @@
                 { speaker: 'Voz Interior', text: 'Avanzemos hacia los pasajes más reflexivos de tu memoria...', nextScene: 'jardin_espejos' }
             ],
             'jardin_espejos': [
-                { speaker: 'Voz Interior', text: 'Llegamos a un jardín de niebla y flores luminosas. Aquí los espejos reflejan lo que intentamos disfrazar.', art: 'jardin' },
+                { speaker: 'Voz Interior', text: 'Llegamos a un jardín de niebla y flores luminosas. Aquí los espejos reflejan lo que intentamos disfrazar.', image: 'jardin' },
                 { speaker: 'Voz Interior', text: 'Hansel y Gretel imaginaron una casa de dulces para tapar el abandono. Cenicienta hablaba con animales para mitigar la soledad.' },
                 { speaker: 'Voz Interior', text: 'Tus mundos imaginarios no son errores ni "locura": son demostraciones de lo sabia que es tu mente para mantenerte a salvo.' },
                 {
@@ -466,13 +499,13 @@
                 { speaker: 'Voz Interior', text: 'Estamos listos para el paso final.', nextScene: 'puerta' }
             ],
             'puerta': [
-                { speaker: 'Voz Interior', text: 'Una puerta de madera noble despide una cálida luz dorada al final del sendero.', effect: 'portal', art: 'puerta' },
-                { speaker: 'Voz Interior', text: 'Soy Tu Subconsciente. Nunca he estado separado de ti; solo estaba esperando que te detuvieras a escucharme.' },
-                { speaker: 'Voz Interior', text: 'Ha llegado el momento de trazar el mapa de tu refugio para que puedas volver cuando quieras, pero con los ojos abiertos.', action: 'open_inventory' }
+                { speaker: 'Voz Interior', text: 'Una puerta de madera noble despide una cálida luz dorada al final del sendero.', effect: 'portal', image: 'puerta' },
+                { speaker: 'Tu Subconsciente', text: 'Soy Tu Subconsciente. Nunca he estado separado de ti; solo estaba esperando que te detuvieras a escucharme.' },
+                { speaker: 'Tu Subconsciente', text: 'Ha llegado el momento de trazar el mapa de tu refugio para que puedas volver cuando quieras, pero con los ojos abiertos.', action: 'open_inventory' }
             ]
         };
 
-        /* --- REFERENCIAS AL DOM --- */
+        /* --- REFERENCIAS DOM --- */
         const ui = {
             dialogueBox: document.getElementById('dialogue-box'),
             speakerName: document.getElementById('speaker-name'),
@@ -484,13 +517,13 @@
             hud: document.getElementById('hud'),
             statEsc: document.getElementById('stat-escapism'),
             statAwa: document.getElementById('stat-awareness'),
-            storyArtContainer: document.getElementById('story-art-container'),
-            artCanvas: document.getElementById('art-canvas')
+            storyImageContainer: document.getElementById('story-image-container'),
+            storyImage: document.getElementById('story-image')
         };
 
         let typeWriterTimeout = null;
 
-        /* --- INICIO Y CONTROL DEL JUEGO --- */
+        /* --- CONTROL DEL JUEGO --- */
         function startGame() {
             ui.startScreen.style.opacity = '0';
             setTimeout(() => {
@@ -518,19 +551,20 @@
 
             ui.speakerName.innerText = currentLine.speaker;
 
-            // Gestión de arte procedimental
-            if (currentLine.art) {
-                state.currentArtScene = currentLine.art;
-                drawArtScene(currentLine.art);
-                ui.storyArtContainer.style.opacity = '1';
-            } else if (currentLine.art === null) {
-                ui.storyArtContainer.style.opacity = '0';
+            // Gestión de imágenes fotográficas nostálgicas
+            if (currentLine.image && imageGallery[currentLine.image]) {
+                ui.storyImage.src = imageGallery[currentLine.image];
+                ui.storyImageContainer.style.opacity = '1';
+                ui.storyImageContainer.classList.add('active');
+            } else if (currentLine.image === null) {
+                ui.storyImageContainer.style.opacity = '0';
+                ui.storyImageContainer.classList.remove('active');
             }
 
-            // Efectos de estrellas
+            // Efectos visuales de fondo (estrellas)
             if (currentLine.effect) state.visualEffect = currentLine.effect;
 
-            // Transcripción progresiva
+            // Transcripción efecto máquina de escribir
             state.isTyping = true;
             let i = 0;
             const text = currentLine.text;
@@ -602,7 +636,7 @@
 
         function showInventory() {
             ui.dialogueBox.classList.remove('active');
-            ui.storyArtContainer.style.opacity = '0';
+            ui.storyImageContainer.style.opacity = '0';
             ui.hud.style.opacity = '0';
             setTimeout(() => {
                 ui.inventoryScreen.style.display = 'block';
@@ -660,92 +694,7 @@
             state.visualEffect = 'portal_open';
         }
 
-        /* --- MOTOR DE DIBUJO DE ARTE ESCÉNICO (CANVAS 2D PROCEDIMENTAL) --- */
-        const artCanvas = document.getElementById('art-canvas');
-        const artCtx = artCanvas.getContext('2d');
-
-        function drawArtScene(sceneType) {
-            const w = artCanvas.width;
-            const h = artCanvas.height;
-            artCtx.clearRect(0, 0, w, h);
-
-            // Fondo base oscuro escénico
-            const bgGrad = artCtx.createLinearGradient(0, 0, 0, h);
-            bgGrad.addColorStop(0, '#0a1526');
-            bgGrad.addColorStop(1, '#020611');
-            artCtx.fillStyle = bgGrad;
-            artCtx.fillRect(0, 0, w, h);
-
-            if (sceneType === 'alicia') {
-                // Silueta de estudiante junto a ventana con luz tenue
-                artCtx.fillStyle = 'rgba(59, 130, 246, 0.15)';
-                artCtx.fillRect(w * 0.6, h * 0.1, w * 0.3, h * 0.8);
-                artCtx.strokeStyle = 'rgba(147, 197, 253, 0.4)';
-                artCtx.lineWidth = 2;
-                artCtx.strokeRect(w * 0.6, h * 0.1, w * 0.3, h * 0.8);
-
-                // Silueta sentada
-                artCtx.fillStyle = '#1e293b';
-                artCtx.beginPath();
-                artCtx.arc(w * 0.35, h * 0.45, 22, 0, Math.PI * 2); // Cabeza
-                artCtx.fill();
-                artCtx.fillRect(w * 0.3, h * 0.48, 30, 60); // Torso
-            } 
-            else if (sceneType === 'madriguera') {
-                // Vórtice espiral
-                artCtx.strokeStyle = 'rgba(96, 165, 250, 0.4)';
-                artCtx.lineWidth = 2;
-                for (let i = 0; i < 6; i++) {
-                    artCtx.beginPath();
-                    artCtx.ellipse(w / 2, h / 2, 40 * i + 10, 20 * i + 5, Math.PI / 4, 0, Math.PI * 2);
-                    artCtx.stroke();
-                }
-            } 
-            else if (sceneType === 'sombrerero') {
-                // Reloj de bolsillo flotando en la penumbra
-                artCtx.strokeStyle = '#f59e0b';
-                artCtx.lineWidth = 4;
-                artCtx.beginPath();
-                artCtx.arc(w / 2, h / 2, 55, 0, Math.PI * 2);
-                artCtx.stroke();
-
-                // Manecillas congeladas a las 6:00
-                artCtx.strokeStyle = '#fef08a';
-                artCtx.lineWidth = 3;
-                artCtx.beginPath();
-                artCtx.moveTo(w / 2, h / 2);
-                artCtx.lineTo(w / 2, h / 2 - 35); // Manecilla minutos
-                artCtx.moveTo(w / 2, h / 2);
-                artCtx.lineTo(w / 2, h / 2 + 25); // Manecilla horas
-                artCtx.stroke();
-            } 
-            else if (sceneType === 'jardin') {
-                // Esferas luminosas flotantes en niebla
-                for (let i = 0; i < 12; i++) {
-                    const x = (i * 53) % w;
-                    const y = (i * 37) % h;
-                    const rad = (i % 3) * 6 + 4;
-                    artCtx.fillStyle = 'rgba(167, 139, 250, 0.5)';
-                    artCtx.beginPath();
-                    artCtx.arc(x, y, rad, 0, Math.PI * 2);
-                    artCtx.fill();
-                }
-            } 
-            else if (sceneType === 'puerta') {
-                // Puerta con luz dorada
-                artCtx.fillStyle = '#fef08a';
-                artCtx.shadowColor = '#f59e0b';
-                artCtx.shadowBlur = 30;
-                artCtx.fillRect(w / 2 - 35, h / 2 - 70, 70, 120);
-                artCtx.shadowBlur = 0;
-
-                artCtx.strokeStyle = '#78350f';
-                artCtx.lineWidth = 4;
-                artCtx.strokeRect(w / 2 - 35, h / 2 - 70, 70, 120);
-            }
-        }
-
-        /* --- MOTOR DE PARTÍCULAS DEL FONDO DE ESTRELLAS --- */
+        /* --- MOTOR DE PARTÍCULAS DE ESTRELLAS DE FONDO --- */
         const bgCanvas = document.getElementById('bg-canvas');
         const bgCtx = bgCanvas.getContext('2d');
         let width, height;
@@ -775,7 +724,6 @@
             }
 
             update(effect) {
-                // Parpadeo suave
                 this.alpha = this.baseAlpha + Math.sin(Date.now() * 0.003 + this.x) * 0.2;
 
                 if (effect === 'stars') {
@@ -790,8 +738,7 @@
                     }
                 } 
                 else if (effect === 'frozen') {
-                    // Flotación lenta y tenue para dar sensación de tiempo detenido pero vivo
-                    this.y -= this.speed * 0.05;
+                    this.y -= this.speed * 0.08;
                     if (this.y < 0) this.y = height;
                 } 
                 else if (effect === 'portal' || effect === 'portal_open') {
@@ -814,8 +761,7 @@
             }
         }
 
-        // Crear 120 estrellas
-        for (let i = 0; i < 120; i++) {
+        for (let i = 0; i < 130; i++) {
             particles.push(new Particle());
         }
 
