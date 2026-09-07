@@ -318,6 +318,10 @@
                 <span>🛡️ Escapismo:</span>
                 <span id="stat-escapism" class="font-bold">0</span>
             </div>
+            <div class="stat-badge text-rose-400" id="heart-badge" style="display: none;">
+                <span>❤️ Corazón:</span>
+                <span id="stat-hearts" class="font-bold">1</span>
+            </div>
             <div class="stat-badge text-emerald-300">
                 <span>👁️ Consciencia:</span>
                 <span id="stat-awareness" class="font-bold">0</span>
@@ -378,7 +382,8 @@
             isTyping: false,
             stats: {
                 escapism: 0,
-                awareness: 0
+                awareness: 0,
+                hearts: 0
             },
             visualEffect: 'stars'
         };
@@ -427,9 +432,14 @@
                     text: 'El Sombrerero te observa con curiosidad y pregunta: "¿Por qué un cuervo se parece a un escritorio?" ¿Cómo decides responder?',
                     choices: [
                         { text: 'No lo sé, prefiero no buscar respuestas difíciles y dejar las cosas como están.', next: 'fiesta_te_a', stat: 'escapism' },
-                        { text: 'Porque ambos guardan secretos que solo el tiempo y la paciencia revelan.', next: 'fiesta_te_b', stat: 'awareness' }
+                        { text: 'Porque ambos guardan secretos que solo el tiempo y la paciencia revelan.', next: 'fiesta_te_b', stat: 'awareness' },
+                        { text: '¡Fin a la inmensa cabezota!', next: 'fiesta_te_easter_egg', stat: 'heart' }
                     ]
                 }
+            ],
+            'fiesta_te_easter_egg': [
+                { speaker: 'El Sombrerero', text: '¡Un grito de rebelión contra la Reina Roja resuena en la mesa! Las tazas de té vibran y un destello escarlata cruza el cielo.' },
+                { speaker: 'Voz Interior', text: 'Has invocado el espíritu desafiante de Alicia frente a la tiranía del miedo. Has ganado un Corazón Rojo de audacia.', nextScene: 'fiesta_te' }
             ],
             'fiesta_te_a': [
                 { speaker: 'Voz Interior', text: 'Eliges resguardarte en lo estático. Te ahorra la confusión del presente, pero detiene tu reloj personal.' },
@@ -794,6 +804,12 @@
             } else if (choice.stat === 'awareness') {
                 state.stats.awareness++;
                 ui.statAwa.innerText = state.stats.awareness;
+            } else if (choice.stat === 'heart') {
+                state.stats.hearts++;
+                const heartBadge = document.getElementById('heart-badge');
+                if (heartBadge) heartBadge.style.display = 'flex';
+                const statHearts = document.getElementById('stat-hearts');
+                if (statHearts) statHearts.innerText = state.stats.hearts;
             }
             playScene(choice.next);
         }
