@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Refugios de la Mente</title>
+    
+    <!-- Tailwind CSS para el diseño de la interfaz -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fuentes de Google: Playfair Display para títulos (estilo cuento), Inter para lectura -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #0f172a; /* Slate 900 */
+            --text-main: #e2e8f0;
+            --accent: #8b5cf6; /* Violet 500 */
+            --accent-glow: rgba(139, 92, 246, 0.5);
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            user-select: none; /* Evitar selección de texto accidental al jugar */
+        }
+
+        h1, h2, h3, .serif-font {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Contenedor principal del juego */
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Canvas de fondo para efectos visuales */
+        #bg-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* Capa oscura para asegurar la legibilidad del texto */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, transparent 0%, #0f172a 90%);
+            z-index: 2;
+        }
+
+        /* Caja de diálogo al estilo Visual Novel */
+        #dialogue-box {
+            position: absolute;
+            bottom: 5%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 800px;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 2rem;
+            z-index: 10;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px var(--accent-glow);
+            transition: all 0.5s ease;
+            opacity: 0;
+            pointer-events: none; /* Inactivo hasta que aparezca */
+        }
+
+        #dialogue-box.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translate(-50%, 0);
+        }
+
+        /* Nombre del personaje que habla */
+        #speaker-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.25rem;
+            color: #c4b5fd; /* Violet 300 */
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            letter-spacing: 1px;
+        }
+
+        /* Texto de la historia */
+        #dialogue-text {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            min-height: 80px;
+        }
+
+        /* Contenedor de opciones (decisiones del jugador) */
+        #choices-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        .choice-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .choice-btn:hover {
+            background: rgba(139, 92, 246, 0.2);
+            border-color: var(--accent);
+            transform: translateX(5px);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        /* Botón para continuar el diálogo */
+        #next-btn {
+            position: absolute;
+            bottom: 1rem;
+            right: 1.5rem;
+            background: none;
+            border: none;
+            color: var(--accent);
+            cursor: pointer;
+            font-size: 1.5rem;
+            animation: bounce 2s infinite;
+            display: none;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        /* Pantalla de inicio */
+        #start-screen {
+            position: absolute;
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-color);
+            transition: opacity 1s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            color: white;
+            padding: 1rem 2.5rem;
+            border-radius: 9999px;
+            font-size: 1.25rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(109, 40, 217, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(109, 40, 217, 0.7);
+        }
+
+        /* Pantalla del inventario final */
+        #inventory-screen {
+            position: absolute;
+            z-index: 15;
+            width: 90%;
+            max-width: 700px;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid var(--accent);
+            border-radius: 16px;
+            padding: 2rem;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            box-shadow: 0 0 40px rgba(0,0,0,0.8);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #c4b5fd;
+            font-weight: 600;
+        }
+
+        .input-group textarea {
+            width: 100%;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            border-radius: 8px;
+            padding: 0.75rem;
+            resize: vertical;
+            min-height: 80px;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .input-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        /* HUD - Estadísticas */
+        #hud {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            z-index: 10;
+            display: flex;
+            gap: 1rem;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        .stat-badge {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <!-- Motor Gráfico de Fondo -->
+        <canvas id="bg-canvas"></canvas>
+        <div class="overlay"></div>
+
+        <!-- Heads Up Display (HUD) -->
+        <div id="hud">
+            <div class="stat-badge text-blue-300">
+                <span>🛡️ Escapismo:</span>
+                <span id="stat-escapism">0</span>
+            </div>
+            <div class="stat-badge text-emerald-300">
+                <span>👁️ Consciencia:</span>
+                <span id="stat-awareness">0</span>
+            </div>
+        </div>
+
+        <!-- Pantalla de Inicio -->
+        <div id="start-screen">
+            <h1 class="text-5xl md:text-7xl font-bold mb-4 text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400 serif-font">
+                El País de las Maravillas
+            </h1>
+            <p class="text-xl md:text-2xl mb-8 text-gray-300 serif-font italic text-center px-4">
+                "Una exploración interactiva de los refugios de la mente."
+            </p>
+            <button class="btn-primary" onclick="startGame()">Comenzar el Viaje</button>
+            <p class="mt-8 text-sm text-gray-500">Ponte audífonos para una mejor experiencia.</p>
+        </div>
+
+        <!-- Interfaz de Novela Visual -->
+        <div id="dialogue-box">
+            <div id="speaker-name">Ceniciento</div>
+            <div id="dialogue-text"></div>
+            <div id="choices-container">
+                <!-- Las opciones se generan dinámicamente aquí -->
+            </div>
+            <button id="next-btn" onclick="advanceDialogue()">▼</button>
+        </div>
+
+        <!-- Pantalla de Inventario Final (Evaluación Pedagógica) -->
+        <div id="inventory-screen">
+            <h2 class="text-3xl text-center text-purple-400 mb-2 serif-font">El Mapa de tu Propio Refugio</h2>
+            <p class="text-gray-300 text-sm mb-6 text-center">La imaginación nos salva, pero en algún momento hay que despertar. Construye tu inventario para sanar.</p>
+            
+            <div class="input-group">
+                <label for="q1">🧱 1. El Muro:</label>
+                <p class="text-xs text-gray-400 mb-2">¿Cuál es mi mundo imaginario (un libro, un videojuego, fantasía) en el que me refugio cuando la realidad duele?</p>
+                <textarea id="q1" placeholder="Ej: Me encierro a ver series antiguas sin parar..."></textarea>
+            </div>
+            
+            <div class="input-group">
+                <label for="q2">🎩 2. El Sombrerero:</label>
+                <p class="text-xs text-gray-400 mb-2">¿Qué recuerdo, emoción o miedo intento evitar o "congelar" cuando huyo hacia allá?</p>
+                <textarea id="q2" placeholder="Ej: Intento no pensar en la ansiedad que me da el futuro..."></textarea>
+            </div>
+            
+            <div class="input-group">
+                <label for="q3">🗝️ 3. La Llave de Oro:</label>
+                <p class="text-xs text-gray-400 mb-2">¿Qué pequeña acción real puedo hacer hoy para conectar con el mundo real de manera suave y segura?</p>
+                <textarea id="q3" placeholder="Ej: Voy a salir a caminar 10 minutos sin audífonos."></textarea>
+            </div>
+
+            <div class="flex justify-center mt-6">
+                <button class="btn-primary text-sm py-2 px-6" onclick="finishGame()">Guardar en mi Memoria</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        /* --- ESTADO DEL JUEGO --- */
+        const state = {
+            scene: 'intro',
+            dialogueIndex: 0,
+            isTyping: false,
+            stats: {
+                escapism: 0,
+                awareness: 0
+            },
+            visualEffect: 'stars' // stars, falling, frozen, portal
+        };
+
+        /* --- BASE DE DATOS NARRATIVA (Guion Pedagógico) --- */
+        const script = {
+            'intro': [
+                { speaker: 'Ceniciento', text: 'Respira profundo. Cierra los ojos un momento, y luego vuelve a abrirlos.' },
+                { speaker: 'Ceniciento', text: 'Bienvenido a un viaje al interior de la psique humana. Soy Ceniciento, tu guía.' },
+                { speaker: 'Ceniciento', text: 'A veces, la realidad duele tanto que nuestra mente decide desconectarse. A esto se le llama disociación.' },
+                { speaker: 'Ceniciento', text: 'Para entenderlo, acompañaremos a nuestra propia mente por la madriguera del conejo.', action: 'start_fall' }
+            ],
+            'madriguera': [
+                { speaker: 'La Mente', text: 'El suelo desaparece. Sientes que caes en el vacío. Los recuerdos pasan frente a ti como objetos flotantes.' },
+                { speaker: 'Ceniciento', text: 'Tras caer y llorar, Alicia se preguntó: "¿Era yo la misma al levantarme esta mañana? Si no soy la misma... ¿quién demonios soy?"' },
+                { speaker: 'Ceniciento', text: 'Olvidar es el primer mecanismo de defensa del cerebro ante el trauma. ¿Qué haces tú cuando caes?' },
+                {
+                    speaker: 'Decisión',
+                    text: 'Cuando enfrentas un dolor muy grande, ¿cuál es tu instinto?',
+                    choices: [
+                        { text: 'Aislarme, perderme en series o mundos de fantasía para no pensar.', next: 'madriguera_a', stat: 'escapism' },
+                        { text: 'Abrumarme, sentir que pierdo el control y apagar mis recuerdos.', next: 'madriguera_b', stat: 'escapism' },
+                        { text: 'Intento mirar el problema, aunque me lastime, para saber contra qué lucho.', next: 'madriguera_c', stat: 'awareness' }
+                    ]
+                }
+            ],
+            'madriguera_a': [
+                { speaker: 'Ceniciento', text: 'Interesante. Tu mente usa la imaginación como un escudo activo. Es un lugar cálido, pero aisla.' },
+                { speaker: 'Ceniciento', text: 'Avanzamos más profundo...', nextScene: 'fiesta_te' }
+            ],
+            'madriguera_b': [
+                { speaker: 'Ceniciento', text: 'Comprendo. Tu mente usa el olvido como un refugio de emergencia. Te apagas para no quemarte.' },
+                { speaker: 'Ceniciento', text: 'Avanzamos más profundo...', nextScene: 'fiesta_te' }
+            ],
+            'madriguera_c': [
+                { speaker: 'Ceniciento', text: 'Valiente elección. Enfrentar la caída genera consciencia, pero requiere mucha energía emocional.' },
+                { speaker: 'Ceniciento', text: 'Avanzamos más profundo...', nextScene: 'fiesta_te' }
+            ],
+            'fiesta_te': [
+                { speaker: 'La Mente', text: 'Llegas a una mesa larga. Todo está en silencio. Los relojes no hacen "tic-tac".', effect: 'frozen' },
+                { speaker: 'Ceniciento', text: 'Hansel y Gretel imaginaron una casa de dulces para disfrazar el hambre. La magia nace del trauma.' },
+                { speaker: 'Ceniciento', text: 'Aquí, en la Merienda de Locos, el Sombrerero discutió con el Tiempo. Como castigo, el tiempo se detuvo para siempre a las 6:00 pm.' },
+                { speaker: 'Ceniciento', text: 'En la psicología, esto es el "Tiempo Congelado". Una parte de ti se queda atrapada en el momento del dolor.' },
+                {
+                    speaker: 'Decisión',
+                    text: 'Miras un reloj flotante frente a ti. Está detenido.',
+                    choices: [
+                        { text: 'Dejarlo detenido. Es más seguro si nada cambia.', next: 'fiesta_te_a', stat: 'escapism' },
+                        { text: 'Tocar las manecillas e intentar que el tiempo vuelva a correr.', next: 'fiesta_te_b', stat: 'awareness' }
+                    ]
+                }
+            ],
+            'fiesta_te_a': [
+                { speaker: 'Ceniciento', text: 'El reloj permanece inerte. El estancamiento protege, pero impide crecer.' },
+                { speaker: 'Ceniciento', text: 'Sin embargo, no podemos vivir eternamente en la fantasía.', nextScene: 'puerta' }
+            ],
+            'fiesta_te_b': [
+                { speaker: 'Ceniciento', text: '¡Clank! Las manecillas se mueven. El recuerdo duele, pero el tiempo vuelve a fluir.' },
+                { speaker: 'Ceniciento', text: 'El movimiento es el primer paso hacia la sanación.', nextScene: 'puerta' }
+            ],
+            'puerta': [
+                { speaker: 'La Mente', text: 'Una puerta pequeña y brillante aparece al final del bosque.', effect: 'portal' },
+                { speaker: 'Ceniciento', text: 'La imaginación es maravillosa y nos salva la vida.' },
+                { speaker: 'Ceniciento', text: 'Pero recordar, en un entorno seguro, es lo que finalmente nos ayuda a sanar.' },
+                { speaker: 'Ceniciento', text: 'Es hora de trazar el mapa de tu propio refugio para poder salir de él.', action: 'open_inventory' }
+            ]
+        };
+
+        /* --- REFERENCIAS DEL DOM --- */
+        const ui = {
+            dialogueBox: document.getElementById('dialogue-box'),
+            speakerName: document.getElementById('speaker-name'),
+            dialogueText: document.getElementById('dialogue-text'),
+            choicesContainer: document.getElementById('choices-container'),
+            nextBtn: document.getElementById('next-btn'),
+            startScreen: document.getElementById('start-screen'),
+            inventoryScreen: document.getElementById('inventory-screen'),
+            hud: document.getElementById('hud'),
+            statEsc: document.getElementById('stat-escapism'),
+            statAwa: document.getElementById('stat-awareness')
+        };
+
+        let typeWriterTimeout;
+
+        function startGame() {
+            ui.startScreen.style.opacity = '0';
+            setTimeout(() => {
+                ui.startScreen.style.display = 'none';
+                ui.hud.style.opacity = '1';
+                ui.dialogueBox.classList.add('active');
+                playScene('intro');
+            }, 1000);
+        }
+
+        function playScene(sceneId) {
+            state.scene = sceneId;
+            state.dialogueIndex = 0;
+            renderDialogue();
+        }
+
+        function renderDialogue() {
+            clearTimeout(typeWriterTimeout);
+            ui.choicesContainer.innerHTML = '';
+            ui.nextBtn.style.display = 'none';
+            ui.dialogueText.innerHTML = '';
+            
+            const currentLine = script[state.scene][state.dialogueIndex];
+            if (!currentLine) return;
+
+            ui.speakerName.innerText = currentLine.speaker;
+
+            // Procesar efectos y acciones especiales
+            if (currentLine.effect) state.visualEffect = currentLine.effect;
+            if (currentLine.action === 'start_fall') state.visualEffect = 'falling';
+            if (currentLine.action === 'open_inventory') {
+                showInventory();
+                return;
+            }
+
+            // Efecto máquina de escribir
+            state.isTyping = true;
+            let i = 0;
+            const text = currentLine.text;
+            
+            function typeChar() {
+                if (i < text.length) {
+                    ui.dialogueText.innerHTML += text.charAt(i);
+                    i++;
+                    typeWriterTimeout = setTimeout(typeChar, 30); // Velocidad de escritura
+                } else {
+                    state.isTyping = false;
+                    showOptions(currentLine);
+                }
+            }
+            typeChar();
+        }
+
+        function showOptions(line) {
+            if (line.choices) {
+                line.choices.forEach(choice => {
+                    const btn = document.createElement('button');
+                    btn.className = 'choice-btn';
+                    btn.innerText = choice.text;
+                    btn.onclick = () => makeChoice(choice);
+                    ui.choicesContainer.appendChild(btn);
+                });
+            } else if (line.nextScene) {
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn text-center text-purple-300 font-bold';
+                btn.innerText = "Continuar el viaje...";
+                btn.onclick = () => playScene(line.nextScene);
+                ui.choicesContainer.appendChild(btn);
+            } else {
+                ui.nextBtn.style.display = 'block';
+            }
+        }
+
+        function makeChoice(choice) {
+            // Actualizar estadísticas pedagógicas
+            if (choice.stat === 'escapism') {
+                state.stats.escapism++;
+                ui.statEsc.innerText = state.stats.escapism;
+                ui.statEsc.parentElement.classList.add('animate-pulse');
+                setTimeout(() => ui.statEsc.parentElement.classList.remove('animate-pulse'), 1000);
+            } else if (choice.stat === 'awareness') {
+                state.stats.awareness++;
+                ui.statAwa.innerText = state.stats.awareness;
+                ui.statAwa.parentElement.classList.add('animate-pulse');
+                setTimeout(() => ui.statAwa.parentElement.classList.remove('animate-pulse'), 1000);
+            }
+
+            // Cambiar de escena basado en la decisión
+            playScene(choice.next);
+        }
+
+        function advanceDialogue() {
+            if (state.isTyping) {
+                // Completar texto si hace clic mientras escribe
+                clearTimeout(typeWriterTimeout);
+                const currentLine = script[state.scene][state.dialogueIndex];
+                ui.dialogueText.innerHTML = currentLine.text;
+                state.isTyping = false;
+                showOptions(currentLine);
+            } else {
+                // Avanzar a la siguiente línea
+                state.dialogueIndex++;
+                if (state.dialogueIndex < script[state.scene].length) {
+                    renderDialogue();
+                }
+            }
+        }
+
+        function showInventory() {
+            ui.dialogueBox.classList.remove('active');
+            ui.hud.style.opacity = '0';
+            setTimeout(() => {
+                ui.inventoryScreen.style.display = 'block';
+                // Añadir animación de entrada
+                ui.inventoryScreen.animate([
+                    { opacity: 0, transform: 'translate(-50%, -40%)' },
+                    { opacity: 1, transform: 'translate(-50%, -50%)' }
+                ], { duration: 800, fill: 'forwards', easing: 'ease-out' });
+            }, 500);
+        }
+
+        function finishGame() {
+            const q1 = document.getElementById('q1').value;
+            const q2 = document.getElementById('q2').value;
+            const q3 = document.getElementById('q3').value;
+
+            if(!q1 || !q2 || !q3) {
+                const btn = document.querySelector('#inventory-screen .btn-primary');
+                btn.innerText = "Por favor, completa tus reflexiones";
+                btn.style.background = "#e11d48"; // Rojo
+                setTimeout(() => {
+                    btn.innerText = "Guardar en mi Memoria";
+                    btn.style.background = ""; // Restaurar gradiente css
+                }, 2000);
+                return;
+            }
+
+            // Transformar la UI para el mensaje final
+            ui.inventoryScreen.innerHTML = `
+                <h2 class="text-3xl text-center text-purple-400 mb-6 serif-font">Has vuelto.</h2>
+                <p class="text-gray-200 text-lg mb-4 text-center">Tu mente no está rota por crear fantasías o por olvidar cosas; está siendo increíblemente inteligente intentando protegerte.</p>
+                <p class="text-gray-200 text-lg mb-8 text-center">Agradece a tus refugios, pero recuerda que tienes la fuerza para abrir la puerta de regreso a la realidad.</p>
+                <div class="p-4 bg-gray-800 rounded-lg border border-gray-700">
+                    <h3 class="text-emerald-400 font-bold mb-2">Tu Llave de Oro:</h3>
+                    <p class="text-white italic">"${q3}"</p>
+                </div>
+                <div class="mt-8 text-center text-sm text-gray-500">Fin de la experiencia. Puedes cerrar esta ventana.</div>
+            `;
+            
+            // Cambiar fondo a algo pacífico
+            state.visualEffect = 'portal_open';
+        }
+
+        /* --- MOTOR GRÁFICO (CANVAS) --- */
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let particles = [];
+
+        function resizeCanvas() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor(type) {
+                this.type = type;
+                this.x = Math.random() * width;
+                this.y = type === 'falling' ? height + Math.random() * 100 : Math.random() * height;
+                this.size = Math.random() * 3 + 1;
+                this.speed = Math.random() * 2 + 0.5;
+                this.angle = Math.random() * Math.PI * 2;
+                this.color = `rgba(${100 + Math.random()*100}, ${100 + Math.random()*100}, 255, ${Math.random()*0.5 + 0.2})`;
+                
+                // Elementos temáticos para la caída (relojes, tazas, cartas)
+                this.symbols = ['☕', '🕰️', '♠️', '♥️', '🗝️', '🐇'];
+                this.symbol = this.symbols[Math.floor(Math.random() * this.symbols.length)];
+                this.isSymbol = Math.random() > 0.8; 
+            }
+
+            update(effect) {
+                if (effect === 'stars') {
+                    this.y -= this.speed * 0.2;
+                    if (this.y < 0) this.y = height;
+                } 
+                else if (effect === 'falling') {
+                    // Simular que el jugador cae (las partículas suben rápido)
+                    this.y -= this.speed * 3;
+                    this.angle += 0.02;
+                    if (this.y < -50) {
+                        this.y = height + 50;
+                        this.x = Math.random() * width;
+                    }
+                }
+                else if (effect === 'frozen') {
+                    // Partículas suspendidas, vibran levemente
+                    this.x += Math.sin(Date.now() * 0.001 + this.angle) * 0.2;
+                    this.y += Math.cos(Date.now() * 0.001 + this.angle) * 0.2;
+                }
+                else if (effect === 'portal' || effect === 'portal_open') {
+                    // Atraídas hacia el centro
+                    const dx = width/2 - this.x;
+                    const dy = height/2 - this.y;
+                    this.x += dx * 0.01;
+                    this.y += dy * 0.01;
+                    
+                    if (Math.abs(dx) < 10 && Math.abs(dy) < 10) {
+                        this.x = Math.random() * width;
+                        this.y = Math.random() * height;
+                    }
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+
+                if (this.isSymbol && (state.visualEffect === 'falling' || state.visualEffect === 'frozen')) {
+                    ctx.font = `${this.size * 5}px Arial`;
+                    ctx.fillStyle = `rgba(255,255,255,${state.visualEffect === 'frozen' ? 0.3 : 0.6})`;
+                    ctx.fillText(this.symbol, 0, 0);
+                } else {
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.restore();
+            }
+        }
+
+        // Inicializar partículas
+        for (let i = 0; i < 150; i++) {
+            particles.push(new Particle('stars'));
+        }
+
+        function drawPortal(isOpen) {
+            const cx = width / 2;
+            const cy = height / 2;
+            const time = Date.now() * 0.001;
+
+            ctx.save();
+            ctx.translate(cx, cy);
+            
+            // Halo exterior
+            const gradient = ctx.createRadialGradient(0, 0, 10, 0, 0, isOpen ? 600 : 200);
+            gradient.addColorStop(0, isOpen ? 'rgba(255, 255, 255, 1)' : 'rgba(255, 230, 150, 0.8)');
+            gradient.addColorStop(0.2, isOpen ? 'rgba(139, 92, 246, 0.8)' : 'rgba(180, 130, 50, 0.5)');
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(0, 0, isOpen ? 600 : 200 + Math.sin(time*2)*10, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        function animate() {
+            // Limpiar canvas con estela (trail effect)
+            ctx.fillStyle = `rgba(15, 23, 42, ${state.visualEffect === 'falling' ? 0.2 : 0.4})`;
+            ctx.fillRect(0, 0, width, height);
+
+            if (state.visualEffect === 'portal' || state.visualEffect === 'portal_open') {
+                drawPortal(state.visualEffect === 'portal_open');
+            }
+
+            particles.forEach(p => {
+                p.update(state.visualEffect);
+                p.draw();
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        // EventListeners para avance con teclado
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' || e.code === 'Enter') {
+                if (ui.dialogueBox.classList.contains('active') && ui.choicesContainer.children.length === 0) {
+                    advanceDialogue();
+                }
+            }
+        });
+
+        // Iniciar animación al cargar
+        window.onload = () => {
+            animate();
+        };
+    </script>
+</body>
+</html>
