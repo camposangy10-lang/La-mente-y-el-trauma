@@ -1,15 +1,15 @@
-<!<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <!-- Chosen Palette: Midnight Sapphire & Vintage Ether -->
     <!-- Application Structure Plan:
         El juego está estructurado como una Aventura Narrativa Interactiva y Psicológica (SPA):
         1. Pantalla de Bienvenida: Atmósfera introspectiva con temática de exploración del subconsciente.
-        2. Campo de Estrellas Dinámico (HTML5 Canvas): Fondo azul estelar constante con físicas reactivas a la velocidad emocional de la narración (caída, tiempo congelado, vórtice).
-        3. Galería Fotográfica Nostálgica (Vintage Analog Style):
-           - Fotografía de alta resolución con estilo de cámara antigua (grano de película, viñeta, virado sepia/frío y bordes suavizados).
-           - Tamaño amplio y prominente en el centro de la pantalla.
-           - Transiciones suaves de aparición y desaparición (crossfade) coordinadas con los momentos cumbre de la historia (Alicia, Madriguera, Sombrerero, Jardín de Espejos, Puerta Dorada).
+        2. Campo de Estrellas Dinámico (HTML5 Canvas 2D): Fondo azul estelar constante con físicas reactivas a la velocidad emocional de la narración (nunca se detiene totalmente).
+        3. Motor de Ilustración Analógica y Fotográfica Vintage (HTML5 Canvas 2D Dedicado):
+           - Generación procedimental avanzada de escenas con acabado de cámara antigua de 35mm (grano de película, fugas de luz en bordes, viñeta profunda, virados sepia/cian e iluminación volumétrica).
+           - Escenas ilustradas: Alicia ante el espejo Victoriano, La Madriguera con relojes flotantes, El Sombrerero Loco y la merienda nocturna, El Jardín de Espejos bioluminiscente y La Puerta Dorada radiante.
+           - Transiciones fluidas de opacidad para la máxima inmersión.
         4. Interfaz de Novela Visual (HUD & Dialogue Box):
            - Guía a cargo de la "Voz Interior" (que al final se revela como "Tu Subconsciente").
            - Indicadores en tiempo real para 'Escapismo' y 'Consciencia'.
@@ -18,10 +18,10 @@
            - Formulario de reflexión personal y diagnóstico automático basado en el balance de Escapismo vs Consciencia.
     -->
     <!-- Visualization & Content Choices:
-        - Estrellas de Fondo: HTML5 Canvas 2D interactivo.
-        - Escenas Fotográficas: Elementos <img> con fuentes fotográficas estilizadas y filtros CSS de cámara analógica vintage (grain, vignette, sepia).
+        - Estrellas de Fondo: HTML5 Canvas 2D interactivo con constante deriva física.
+        - Escenas Fotográficas Nostálgicas: Motor gráfico en Canvas 2D dedicado que simula fotografías analógicas vintage sin depender de URLs externas ni gráficos SVG.
         - Contenedores: Responsive con Tailwind CSS y Glassmorphism.
-        - Justificación: Ofrece una experiencia visualmente impactante, inmersiva y emotiva para estudiantes de 16-17 años, cumpliendo estrictamente con la política de NO utilizar SVG ni Mermaid JS.
+        - Justificación: Ofrece una experiencia visualmente impactante, inmersiva, robusta y libre de enlaces rotos, cumpliendo estrictamente con la política de NO utilizar SVG ni Mermaid JS.
     -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
 
@@ -80,21 +80,20 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at center, transparent 15%, #030814 90%);
+            background: radial-gradient(circle at center, transparent 10%, #030814 88%);
             z-index: 2;
             pointer-events: none;
         }
 
-        /* --- CONTENEDOR DE IMÁGENES FOTOGRÁFICAS VINTAGE --- */
         #story-image-container {
             position: absolute;
-            top: 33%;
+            top: 32%;
             left: 50%;
             transform: translate(-50%, -50%);
             width: 92%;
-            max-width: 680px;
-            height: 42vh;
-            max-height: 380px;
+            max-width: 760px;
+            height: 46vh;
+            max-height: 420px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -104,51 +103,31 @@
             pointer-events: none;
             border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.95), 0 0 35px rgba(59, 130, 246, 0.35);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.95), 0 0 35px rgba(59, 130, 246, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.2);
+            background: #020610;
         }
 
-        #story-image {
+        #art-canvas {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            /* Filtro de Cámara Analógica Vintage / Nostálgica */
-            filter: sepia(0.3) contrast(1.15) brightness(0.85) saturate(0.8);
-            transition: transform 9s ease-out;
         }
 
-        #story-image-container.active #story-image {
-            transform: scale(1.08);
-        }
-
-        /* Efecto de Viñeta y Grano sobre la Fotografía */
-        #story-image-container::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            box-shadow: inset 0 0 70px rgba(3, 8, 20, 0.9);
-            background: linear-gradient(180deg, rgba(3, 8, 20, 0.15) 0%, rgba(3, 8, 20, 0.65) 100%);
-            pointer-events: none;
-        }
-
-        /* --- CUADRO DE DIÁLOGO --- */
         #dialogue-box {
             position: absolute;
-            bottom: 4%;
+            bottom: 3.5%;
             left: 50%;
             transform: translateX(-50%);
             width: 92%;
-            max-width: 820px;
-            background: rgba(8, 16, 32, 0.92);
+            max-width: 840px;
+            background: rgba(7, 14, 28, 0.93);
             border: 1px solid rgba(255, 255, 255, 0.18);
-            backdrop-filter: blur(14px);
+            backdrop-filter: blur(16px);
             border-radius: 16px;
             padding: 1.75rem 2rem;
             z-index: 10;
-            box-shadow: 0 10px 35px rgba(0,0,0,0.8), 0 0 25px var(--accent-glow);
+            box-shadow: 0 10px 35px rgba(0,0,0,0.85), 0 0 25px var(--accent-glow);
             transition: all 0.4s ease;
             opacity: 0;
             pointer-events: none;
@@ -195,10 +174,10 @@
         }
 
         .choice-btn:hover {
-            background: rgba(59, 130, 246, 0.25);
+            background: rgba(59, 130, 246, 0.28);
             border-color: var(--accent);
             transform: translateX(4px);
-            box-shadow: 0 0 12px var(--accent-glow);
+            box-shadow: 0 0 14px var(--accent-glow);
         }
 
         #next-btn {
@@ -256,8 +235,8 @@
             position: absolute;
             z-index: 15;
             width: 92%;
-            max-width: 720px;
-            background: rgba(8, 16, 32, 0.95);
+            max-width: 740px;
+            background: rgba(7, 14, 28, 0.96);
             border: 1px solid var(--accent);
             border-radius: 16px;
             padding: 2rem;
@@ -265,7 +244,7 @@
             left: 50%;
             transform: translate(-50%, -50%);
             display: none;
-            box-shadow: 0 0 45px rgba(0,0,0,0.95);
+            box-shadow: 0 0 50px rgba(0,0,0,0.95);
             max-height: 88vh;
             overflow-y: auto;
         }
@@ -284,7 +263,7 @@
 
         .input-group textarea {
             width: 100%;
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(0, 0, 0, 0.45);
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: white;
             border-radius: 8px;
@@ -312,7 +291,7 @@
         }
 
         .stat-badge {
-            background: rgba(0, 0, 0, 0.65);
+            background: rgba(0, 0, 0, 0.7);
             border: 1px solid rgba(255, 255, 255, 0.18);
             padding: 0.4rem 0.9rem;
             border-radius: 9999px;
@@ -327,16 +306,13 @@
 <body>
 
     <div id="game-container">
-        <!-- Canvas de fondo para las estrellas -->
         <canvas id="bg-canvas"></canvas>
         <div class="overlay"></div>
 
-        <!-- Contenedor para Imágenes Fotográficas Nostálgicas -->
         <div id="story-image-container">
-            <img id="story-image" src="" alt="Escena de la historia">
+            <canvas id="art-canvas" width="900" height="500"></canvas>
         </div>
 
-        <!-- Heads Up Display (HUD) -->
         <div id="hud">
             <div class="stat-badge text-blue-300">
                 <span>🛡️ Escapismo:</span>
@@ -348,7 +324,6 @@
             </div>
         </div>
 
-        <!-- Pantalla de Inicio -->
         <div id="start-screen">
             <h1 class="text-4xl md:text-6xl font-bold mb-4 text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-cyan-200 to-indigo-300 serif-font">
                 Refugios de la Mente
@@ -360,7 +335,6 @@
             <p class="mt-6 text-xs text-gray-400 text-center">Recomendado usar audífonos para mayor inmersión.</p>
         </div>
 
-        <!-- Interfaz de Novela Visual -->
         <div id="dialogue-box">
             <div id="speaker-name">Voz Interior</div>
             <div id="dialogue-text"></div>
@@ -368,7 +342,6 @@
             <button id="next-btn" onclick="advanceDialogue()">▼</button>
         </div>
 
-        <!-- Pantalla de Inventario Final (Evaluación Pedagógica) -->
         <div id="inventory-screen">
             <h2 class="text-2xl md:text-3xl text-center text-blue-400 mb-2 serif-font">El Mapa de tu Propio Refugio</h2>
             <p class="text-gray-300 text-xs md:text-sm mb-5 text-center">La imaginación nos protege, pero recordar en un entorno seguro nos ayuda a sanar. Responde para trazar tu mapa.</p>
@@ -399,16 +372,6 @@
     </div>
 
     <script>
-        /* --- BANCO DE IMÁGENES FOTOGRÁFICAS NOSTÁLGICAS (ESTILO CÁMARA ANTIGUA) --- */
-        const imageGallery = {
-            'alicia': 'https://images.unsplash.com/photo-1518895949257-7621c3c786d7?auto=format&fit=crop&w=1200&q=80',
-            'madriguera': 'https://images.unsplash.com/photo-1509114397022-ed747cca3f65?auto=format&fit=crop&w=1200&q=80',
-            'sombrerero': 'https://images.unsplash.com/photo-1501139083538-0139583c060f?auto=format&fit=crop&w=1200&q=80',
-            'jardin': 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1200&q=80',
-            'puerta': 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1200&q=80'
-        };
-
-        /* --- ESTADO DEL JUEGO --- */
         const state = {
             scene: 'intro',
             dialogueIndex: 0,
@@ -420,13 +383,12 @@
             visualEffect: 'stars'
         };
 
-        /* --- GUION NARRATIVO COMPLETO --- */
         const script = {
             'intro': [
                 { speaker: 'Voz Interior', text: 'Respira profundo... Cierra los ojos un instante y concéntrate en tu respiración.' },
                 { speaker: 'Voz Interior', text: 'Bienvenido a un viaje al interior de tu propia mente. Soy esa parte silenciosa dentro de ti que observa todo lo que sientes.' },
                 { speaker: 'Voz Interior', text: 'A veces, el mundo real exige demasiado o duele sin previo aviso. Cuando eso ocurre, nuestra mente crea refugios secretos o desactiva las emociones.' },
-                { speaker: 'Voz Interior', text: 'Piensa en Alicia: una joven agobiada por las presiones y las dudas, que un día decidió seguir a un conejo hacia lo desconocido...', image: 'alicia' },
+                { speaker: 'Voz Interior', text: 'Piensa en Alicia: una joven agobiada por las presiones, exigencias y dudas, que un día decidió seguir a un conejo hacia lo desconocido...', image: 'alicia' },
                 { speaker: 'Voz Interior', text: 'Usaremos su travesía como un espejo para comprender cómo funciona tu propia imaginación protectora.' },
                 { speaker: 'Voz Interior', text: 'Ha llegado el momento. Caigamos juntos por la madriguera...', effect: 'falling', image: 'madriguera', nextScene: 'madriguera' }
             ],
@@ -505,7 +467,6 @@
             ]
         };
 
-        /* --- REFERENCIAS DOM --- */
         const ui = {
             dialogueBox: document.getElementById('dialogue-box'),
             speakerName: document.getElementById('speaker-name'),
@@ -517,13 +478,236 @@
             hud: document.getElementById('hud'),
             statEsc: document.getElementById('stat-escapism'),
             statAwa: document.getElementById('stat-awareness'),
-            storyImageContainer: document.getElementById('story-image-container'),
-            storyImage: document.getElementById('story-image')
+            storyImageContainer: document.getElementById('story-image-container')
         };
+
+        const artCanvas = document.getElementById('art-canvas');
+        const artCtx = artCanvas.getContext('2d');
+
+        function renderArtScene(sceneKey) {
+            const w = artCanvas.width;
+            const h = artCanvas.height;
+            artCtx.clearRect(0, 0, w, h);
+
+            const bgGrad = artCtx.createRadialGradient(w/2, h/2, 40, w/2, h/2, w*0.7);
+            bgGrad.addColorStop(0, '#151d30');
+            bgGrad.addColorStop(0.6, '#0a0e1a');
+            bgGrad.addColorStop(1, '#02050b');
+            artCtx.fillStyle = bgGrad;
+            artCtx.fillRect(0, 0, w, h);
+
+            if (sceneKey === 'alicia') {
+                const wallGrad = artCtx.createLinearGradient(0, 0, 0, h);
+                wallGrad.addColorStop(0, '#1c263b');
+                wallGrad.addColorStop(0.7, '#0d1322');
+                wallGrad.addColorStop(1, '#080a12');
+                artCtx.fillStyle = wallGrad;
+                artCtx.fillRect(0, 0, w, h);
+
+                artCtx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+                artCtx.lineWidth = 2;
+                for (let x = 0; x < w; x += 40) {
+                    artCtx.beginPath();
+                    artCtx.moveTo(x, h * 0.7);
+                    artCtx.lineTo(x - (w/2 - x) * 0.5, h);
+                    artCtx.stroke();
+                }
+
+                artCtx.save();
+                artCtx.shadowColor = 'rgba(245, 158, 11, 0.5)';
+                artCtx.shadowBlur = 35;
+                artCtx.strokeStyle = '#d97706';
+                artCtx.lineWidth = 8;
+                artCtx.beginPath();
+                artCtx.ellipse(w * 0.5, h * 0.42, 110, 150, 0, 0, Math.PI * 2);
+                artCtx.stroke();
+                artCtx.restore();
+
+                const mirrorInner = artCtx.createRadialGradient(w*0.5, h*0.42, 10, w*0.5, h*0.42, 120);
+                mirrorInner.addColorStop(0, 'rgba(147, 197, 253, 0.8)');
+                mirrorInner.addColorStop(0.5, 'rgba(59, 130, 246, 0.3)');
+                mirrorInner.addColorStop(1, 'rgba(15, 23, 42, 0.9)');
+                artCtx.fillStyle = mirrorInner;
+                artCtx.beginPath();
+                artCtx.ellipse(w * 0.5, h * 0.42, 104, 144, 0, 0, Math.PI * 2);
+                artCtx.fill();
+
+                artCtx.fillStyle = '#050914';
+                artCtx.beginPath();
+                artCtx.arc(w * 0.5, h * 0.38, 28, 0, Math.PI * 2);
+                artCtx.fill();
+                artCtx.beginPath();
+                artCtx.ellipse(w * 0.5, h * 0.65, 50, 95, 0, Math.PI, 0, true);
+                artCtx.fill();
+
+            } else if (sceneKey === 'madriguera') {
+                for (let r = 280; r > 15; r -= 18) {
+                    artCtx.beginPath();
+                    artCtx.arc(w/2, h/2, r, 0, Math.PI * 2);
+                    artCtx.strokeStyle = `rgba(96, 165, 250, ${0.03 + (280 - r)/600})`;
+                    artCtx.lineWidth = 14;
+                    artCtx.stroke();
+                }
+
+                const clockPositions = [
+                    {x: w*0.28, y: h*0.3, size: 24, rot: 0.4},
+                    {x: w*0.72, y: h*0.65, size: 32, rot: -0.6},
+                    {x: w*0.35, y: h*0.75, size: 20, rot: 0.2}
+                ];
+
+                clockPositions.forEach(c => {
+                    artCtx.save();
+                    artCtx.translate(c.x, c.y);
+                    artCtx.rotate(c.rot);
+                    artCtx.strokeStyle = 'rgba(251, 191, 36, 0.6)';
+                    artCtx.lineWidth = 3;
+                    artCtx.beginPath();
+                    artCtx.arc(0, 0, c.size, 0, Math.PI * 2);
+                    artCtx.stroke();
+                    artCtx.beginPath();
+                    artCtx.moveTo(0, 0);
+                    artCtx.lineTo(0, -c.size * 0.6);
+                    artCtx.lineTo(c.size * 0.4, 0);
+                    artCtx.stroke();
+                    artCtx.restore();
+                });
+
+                const centerGlow = artCtx.createRadialGradient(w/2, h/2, 0, w/2, h/2, 70);
+                centerGlow.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+                centerGlow.addColorStop(0.4, 'rgba(147, 197, 253, 0.6)');
+                centerGlow.addColorStop(1, 'transparent');
+                artCtx.fillStyle = centerGlow;
+                artCtx.beginPath();
+                artCtx.arc(w/2, h/2, 70, 0, Math.PI * 2);
+                artCtx.fill();
+
+            } else if (sceneKey === 'sombrerero') {
+                const moonGlow = artCtx.createRadialGradient(w*0.78, h*0.25, 5, w*0.78, h*0.25, 160);
+                moonGlow.addColorStop(0, 'rgba(224, 231, 255, 0.85)');
+                moonGlow.addColorStop(0.3, 'rgba(96, 165, 250, 0.3)');
+                moonGlow.addColorStop(1, 'transparent');
+                artCtx.fillStyle = moonGlow;
+                artCtx.beginPath();
+                artCtx.arc(w*0.78, h*0.25, 50, 0, Math.PI * 2);
+                artCtx.fill();
+
+                artCtx.fillStyle = '#060a17';
+                artCtx.fillRect(w*0.08, h*0.62, w*0.84, h*0.38);
+
+                artCtx.fillStyle = '#02040a';
+                artCtx.fillRect(w*0.2, h*0.35, 75, 70);
+                artCtx.fillRect(w*0.16, h*0.53, 115, 12);
+                artCtx.fillStyle = 'rgba(217, 119, 6, 0.8)';
+                artCtx.fillRect(w*0.2, h*0.50, 75, 8);
+
+                artCtx.strokeStyle = 'rgba(250, 204, 21, 0.7)';
+                artCtx.lineWidth = 3.5;
+                artCtx.beginPath();
+                artCtx.arc(w*0.55, h*0.56, 26, 0, Math.PI * 2);
+                artCtx.stroke();
+                artCtx.beginPath();
+                artCtx.moveTo(w*0.55, h*0.56);
+                artCtx.lineTo(w*0.55, h*0.42);
+                artCtx.stroke();
+
+                const steamGrad = artCtx.createLinearGradient(0, h*0.55, 0, h*0.35);
+                steamGrad.addColorStop(0, 'rgba(255, 255, 255, 0.3)');
+                steamGrad.addColorStop(1, 'transparent');
+                artCtx.fillStyle = steamGrad;
+                artCtx.beginPath();
+                artCtx.ellipse(w*0.72, h*0.48, 12, 35, 0.2, 0, Math.PI * 2);
+                artCtx.fill();
+
+            } else if (sceneKey === 'jardin') {
+                const mist = artCtx.createLinearGradient(0, 0, 0, h);
+                mist.addColorStop(0, '#040d1a');
+                mist.addColorStop(0.5, '#0b213a');
+                mist.addColorStop(1, '#030814');
+                artCtx.fillStyle = mist;
+                artCtx.fillRect(0, 0, w, h);
+
+                const flowerNodes = [
+                    {x: w*0.18, y: h*0.62, color: 'rgba(167, 243, 208, 0.9)'},
+                    {x: w*0.38, y: h*0.74, color: 'rgba(147, 197, 253, 0.9)'},
+                    {x: w*0.62, y: h*0.68, color: 'rgba(196, 181, 253, 0.9)'},
+                    {x: w*0.82, y: h*0.58, color: 'rgba(167, 243, 208, 0.9)'}
+                ];
+
+                flowerNodes.forEach(f => {
+                    const fg = artCtx.createRadialGradient(f.x, f.y, 2, f.x, f.y, 45);
+                    fg.addColorStop(0, f.color);
+                    fg.addColorStop(0.4, 'rgba(59, 130, 246, 0.3)');
+                    fg.addColorStop(1, 'transparent');
+                    artCtx.fillStyle = fg;
+                    artCtx.beginPath();
+                    artCtx.arc(f.x, f.y, 45, 0, Math.PI * 2);
+                    artCtx.fill();
+                });
+
+                artCtx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+                for (let i = 0; i < 25; i++) {
+                    const rx = (Math.sin(i * 9) * 0.5 + 0.5) * w;
+                    const ry = (Math.cos(i * 13) * 0.5 + 0.5) * h;
+                    artCtx.beginPath();
+                    artCtx.arc(rx, ry, Math.random() * 3 + 1, 0, Math.PI * 2);
+                    artCtx.fill();
+                }
+
+            } else if (sceneKey === 'puerta') {
+                const doorGlow = artCtx.createRadialGradient(w/2, h*0.48, 5, w/2, h*0.48, 280);
+                doorGlow.addColorStop(0, 'rgba(253, 230, 138, 0.95)');
+                doorGlow.addColorStop(0.35, 'rgba(217, 119, 6, 0.45)');
+                doorGlow.addColorStop(1, 'transparent');
+                artCtx.fillStyle = doorGlow;
+                artCtx.fillRect(0, 0, w, h);
+
+                artCtx.fillStyle = '#060a14';
+                artCtx.fillRect(w*0.36, h*0.18, w*0.28, h*0.75);
+
+                artCtx.fillStyle = 'rgba(254, 243, 199, 0.98)';
+                artCtx.fillRect(w*0.38, h*0.21, w*0.24, h*0.72);
+
+                artCtx.save();
+                artCtx.globalCompositeOperation = 'screen';
+                const rayGrad = artCtx.createLinearGradient(w/2, h*0.2, w/2, h);
+                rayGrad.addColorStop(0, 'rgba(255, 255, 255, 0.6)');
+                rayGrad.addColorStop(1, 'rgba(251, 191, 36, 0)');
+                artCtx.fillStyle = rayGrad;
+                artCtx.beginPath();
+                artCtx.moveTo(w*0.38, h*0.21);
+                artCtx.lineTo(w*0.05, h);
+                artCtx.lineTo(w*0.95, h);
+                artCtx.lineTo(w*0.62, h*0.21);
+                artCtx.closePath();
+                artCtx.fill();
+                artCtx.restore();
+            }
+
+            const leakGrad = artCtx.createLinearGradient(0, 0, w*0.4, h*0.4);
+            leakGrad.addColorStop(0, 'rgba(251, 146, 60, 0.16)');
+            leakGrad.addColorStop(1, 'transparent');
+            artCtx.fillStyle = leakGrad;
+            artCtx.fillRect(0, 0, w, h);
+
+            const imgData = artCtx.getImageData(0, 0, w, h);
+            const data = imgData.data;
+            for (let i = 0; i < data.length; i += 16) {
+                const noise = (Math.random() - 0.5) * 20;
+                data[i] = Math.min(255, Math.max(0, data[i] + noise));
+                data[i+1] = Math.min(255, Math.max(0, data[i+1] + noise));
+                data[i+2] = Math.min(255, Math.max(0, data[i+2] + noise));
+            }
+            artCtx.putImageData(imgData, 0, 0);
+
+            const vignette = artCtx.createRadialGradient(w/2, h/2, w*0.35, w/2, h/2, w*0.72);
+            vignette.addColorStop(0, 'transparent');
+            vignette.addColorStop(1, 'rgba(2, 5, 12, 0.85)');
+            artCtx.fillStyle = vignette;
+            artCtx.fillRect(0, 0, w, h);
+        }
 
         let typeWriterTimeout = null;
 
-        /* --- CONTROL DEL JUEGO --- */
         function startGame() {
             ui.startScreen.style.opacity = '0';
             setTimeout(() => {
@@ -551,20 +735,15 @@
 
             ui.speakerName.innerText = currentLine.speaker;
 
-            // Gestión de imágenes fotográficas nostálgicas
-            if (currentLine.image && imageGallery[currentLine.image]) {
-                ui.storyImage.src = imageGallery[currentLine.image];
+            if (currentLine.image) {
+                renderArtScene(currentLine.image);
                 ui.storyImageContainer.style.opacity = '1';
-                ui.storyImageContainer.classList.add('active');
             } else if (currentLine.image === null) {
                 ui.storyImageContainer.style.opacity = '0';
-                ui.storyImageContainer.classList.remove('active');
             }
 
-            // Efectos visuales de fondo (estrellas)
             if (currentLine.effect) state.visualEffect = currentLine.effect;
 
-            // Transcripción efecto máquina de escribir
             state.isTyping = true;
             let i = 0;
             const text = currentLine.text;
@@ -694,7 +873,6 @@
             state.visualEffect = 'portal_open';
         }
 
-        /* --- MOTOR DE PARTÍCULAS DE ESTRELLAS DE FONDO --- */
         const bgCanvas = document.getElementById('bg-canvas');
         const bgCtx = bgCanvas.getContext('2d');
         let width, height;
@@ -731,14 +909,14 @@
                     if (this.y < 0) this.y = height;
                 } 
                 else if (effect === 'falling') {
-                    this.y -= this.speed * 4;
+                    this.y -= this.speed * 4.5;
                     if (this.y < 0) {
                         this.y = height;
                         this.x = Math.random() * width;
                     }
                 } 
                 else if (effect === 'frozen') {
-                    this.y -= this.speed * 0.08;
+                    this.y -= this.speed * 0.15;
                     if (this.y < 0) this.y = height;
                 } 
                 else if (effect === 'portal' || effect === 'portal_open') {
@@ -761,7 +939,7 @@
             }
         }
 
-        for (let i = 0; i < 130; i++) {
+        for (let i = 0; i < 140; i++) {
             particles.push(new Particle());
         }
 
